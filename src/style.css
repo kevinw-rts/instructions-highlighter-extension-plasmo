@@ -3,3 +3,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* This is the main container that Components get injected into */
+#plasmo-shadow-container {
+    left: 80%;
+    top: 20%;
+    margin-right: 10%;
+}
