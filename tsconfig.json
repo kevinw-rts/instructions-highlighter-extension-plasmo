@@ -9,11 +9,16 @@
     "./**/*.tsx"
   ],
   "compilerOptions": {
+    "jsx": "react",
     "paths": {
       "~*": [
         "./src/*"
       ]
     },
     "baseUrl": "."
-  }
+  },
+  "strict": true,
+  "noUnusedLocals": true,
+  "noUnusedParameters": true,
+  "noFallthroughCasesInSwitch": true
 }
