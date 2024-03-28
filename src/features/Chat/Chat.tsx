@@ -19,7 +19,7 @@ const initialMessageState = {
 function Chat() {
   const [message, setMessage] = useState<ChatMessage | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([{ ...initialMessageState }])
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(true)
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [getData, { response, error, isLoading }] = useAxiosLazy(`?format=json`)

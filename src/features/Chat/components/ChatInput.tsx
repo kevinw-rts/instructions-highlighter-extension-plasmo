@@ -1,5 +1,5 @@
 import { TextInput } from 'flowbite-react'
-// import { ArrowUpIcon } from '@heroicons/react/16/solid'
+import { ArrowUpIcon } from '@heroicons/react/16/solid'
 import { useState, forwardRef } from 'react'
 import { type ChatMessage } from '../types/ChatMessage'
 import React from 'react'
@@ -51,7 +51,7 @@ const ChatInput = forwardRef(({ isLoading, onSubmit }: Props, ref: React.Forward
               }`}
           >
             <div className="sr-only">Send</div>
-            {/* <ArrowUpIcon className="w-4 h-4" /> */}
+            <ArrowUpIcon className="w-4 h-4" />
           </button>
         </div>
       </form>

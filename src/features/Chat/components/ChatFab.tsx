@@ -1,4 +1,4 @@
-// import { ChatBubbleLeftRightIcon } from '@heroicons/16/solid'
+import { ChatBubbleLeftRightIcon } from '@heroicons/react/16/solid'
 
 import React from "react"
 
@@ -17,7 +17,7 @@ const ChatFab = ({ isShown, onClick }: Props) => {
       }`}
     >
       <div className="sr-only">Toggle chat window</div>
-      {/* <ChatBubbleLeftRightIcon className="w-6 h-6" /> */}
+      <ChatBubbleLeftRightIcon className="w-6 h-6" />
     </button>
   )
 }

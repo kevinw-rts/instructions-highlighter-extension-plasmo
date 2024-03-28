@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.3",
     "@plasmohq/messaging": "^0.6.2",
     "@tanstack/react-query": "^5.28.8",
     "axios": "^1.6.8",
