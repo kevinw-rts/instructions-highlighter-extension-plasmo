@@ -1,28 +1,32 @@
-import { type RefObject, useEffect, useRef, useState } from 'react'
-import ChatInput from './components/ChatInput'
-import ChatWindow from './components/ChatWindow'
-import { type ChatMessage } from './types/ChatMessage'
-import useAxiosLazy from './hooks/useAxiosLazy'
-import ChatFab from './components/ChatFab'
-import ChatHeader from './components/ChatHeader'
-import useHighlighter from './hooks/useHighlighter'
-import React from 'react'
+import React, { useEffect, useRef, useState, type RefObject } from "react"
+
+import ChatFab from "./components/ChatFab"
+import ChatHeader from "./components/ChatHeader"
+import ChatInput from "./components/ChatInput"
+import ChatWindow from "./components/ChatWindow"
+import useFetchLazy from "./hooks/useFetchLazy"
+import useHighlighter from "./hooks/useHighlighter"
+import { type ChatMessage } from "./types/ChatMessage"
 
 const initialMessageState = {
   id: new Date().toISOString(),
   message: "Welcome to the Allen's Copilot. How can I help you?",
   user_id: 1,
   date: new Date().toDateString(),
-  timestamp: new Date().toISOString(),
+  timestamp: new Date().toISOString()
 }
 
 function Chat() {
   const [message, setMessage] = useState<ChatMessage | null>(null)
-  const [messages, setMessages] = useState<ChatMessage[]>([{ ...initialMessageState }])
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { ...initialMessageState }
+  ])
   const [isChatOpen, setIsChatOpen] = useState<boolean>(true)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [getData, { response, error, isLoading }] = useAxiosLazy(`?format=json`)
+  const [getData, { response, error, isLoading }] = useFetchLazy(
+    `completions?prompt=${message?.message}`
+  )
   const highlightElement = useHighlighter()
 
   /**
@@ -30,8 +34,8 @@ function Chat() {
    * @returns {void}
    */
   useEffect(() => {
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
         if (isChatOpen && document.activeElement === inputRef.current) {
           setIsChatOpen(false)
         }
@@ -39,7 +43,7 @@ function Chat() {
     })
 
     return () => {
-      window.removeEventListener('keydown', () => { })
+      window.removeEventListener("keydown", () => {})
     }
   })
 
@@ -59,8 +63,8 @@ function Chat() {
         id: new Date().toISOString(),
         message: response.data.ip,
         date: new Date().toDateString(),
-        timestamp: new Date().toISOString(),
-      },
+        timestamp: new Date().toISOString()
+      }
     ])
     // highlightElement("Example_computer_program")
   }, [response])
@@ -111,10 +115,12 @@ function Chat() {
       <div
         id="chat"
         className={`flex flex-col w-full h-full relative z-40 transition rounded-lg duration-300 shadow-xl bg-white
-        ${isChatOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 pointer-events-none'}`}
-      >
+        ${isChatOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"}`}>
         <ChatHeader onClose={handleToggleChat} />
-        <ChatWindow isLoading={isLoading && messages.length !== 1} messages={messages} />
+        <ChatWindow
+          isLoading={isLoading && messages.length !== 1}
+          messages={messages}
+        />
         <ChatInput
           isLoading={isLoading && messages.length !== 1}
           onSubmit={handleSubmit}
