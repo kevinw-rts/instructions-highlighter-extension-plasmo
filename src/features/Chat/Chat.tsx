@@ -1,28 +1,34 @@
-import { type RefObject, useEffect, useRef, useState } from 'react'
-import ChatInput from './components/ChatInput'
-import ChatWindow from './components/ChatWindow'
-import { type ChatMessage } from './types/ChatMessage'
-import useAxiosLazy from './hooks/useAxiosLazy'
-import ChatFab from './components/ChatFab'
-import ChatHeader from './components/ChatHeader'
-import useHighlighter from './hooks/useHighlighter'
-import React from 'react'
+import React, { useEffect, useRef, useState, type RefObject } from "react"
+
+import ChatFab from "./components/ChatFab"
+import ChatHeader from "./components/ChatHeader"
+import ChatInput from "./components/ChatInput"
+import ChatWindow from "./components/ChatWindow"
+import useHighlighter from "./hooks/useHighlighter"
+import useMessenger from "./hooks/useMessenger"
+import { type ChatMessage } from "./types/ChatMessage"
+
+import "../../../src/chat.css"
 
 const initialMessageState = {
   id: new Date().toISOString(),
   message: "Welcome to the Allen's Copilot. How can I help you?",
   user_id: 1,
   date: new Date().toDateString(),
-  timestamp: new Date().toISOString(),
+  timestamp: new Date().toISOString()
 }
 
 function Chat() {
   const [message, setMessage] = useState<ChatMessage | null>(null)
-  const [messages, setMessages] = useState<ChatMessage[]>([{ ...initialMessageState }])
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false)
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { ...initialMessageState }
+  ])
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(true)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [getData, { response, error, isLoading }] = useAxiosLazy(`?format=json`)
+  const [getData, { response, error, isLoading }] = useMessenger(
+    `completions?prompt=${message?.message}`
+  )
   const highlightElement = useHighlighter()
 
   /**
@@ -30,8 +36,8 @@ function Chat() {
    * @returns {void}
    */
   useEffect(() => {
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
         if (isChatOpen && document.activeElement === inputRef.current) {
           setIsChatOpen(false)
         }
@@ -39,7 +45,7 @@ function Chat() {
     })
 
     return () => {
-      window.removeEventListener('keydown', () => { })
+      window.removeEventListener("keydown", () => {})
     }
   })
 
@@ -57,12 +63,34 @@ function Chat() {
       {
         ...initialMessageState,
         id: new Date().toISOString(),
-        message: response.data.ip,
+        message:
+          response?.data?.choices[0]?.message?.content ||
+          "Unable to process response",
         date: new Date().toDateString(),
-        timestamp: new Date().toISOString(),
-      },
+        timestamp: new Date().toISOString()
+      }
     ])
-    // highlightElement("Example_computer_program")
+
+    const extractPrompt = `
+      Examine this response. Extract an id from the response. I only want the id, not the entire response. Do not
+      include any special characters. I should be able to take your response and use it as a variable in my code. For
+      example, if you send back "root", I should be able to take your response and run it through a
+      document.getElementById('root') in JavaScript. If you find text within quotes, send back the quoted text without
+      the quotes. Your response should not contain any special characters or spaces.
+
+      Here is the response:
+
+      ${response?.data?.choices[0]?.message?.content}
+    `
+    fetch(`http://127.0.0.1:8000/api/completions?prompt=${extractPrompt}`)
+      .then((resp) => {
+        return resp.json()
+      })
+      .then((data) => {
+        console.log({ data })
+
+        highlightElement(data.choices[0].message.content)
+      })
   }, [response])
 
   /**
@@ -111,10 +139,12 @@ function Chat() {
       <div
         id="chat"
         className={`flex flex-col w-full h-full relative z-40 transition rounded-lg duration-300 shadow-xl bg-white
-        ${isChatOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 pointer-events-none'}`}
-      >
+        ${isChatOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"}`}>
         <ChatHeader onClose={handleToggleChat} />
-        <ChatWindow isLoading={isLoading && messages.length !== 1} messages={messages} />
+        <ChatWindow
+          isLoading={isLoading && messages.length !== 1}
+          messages={messages}
+        />
         <ChatInput
           isLoading={isLoading && messages.length !== 1}
           onSubmit={handleSubmit}
